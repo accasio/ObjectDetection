@@ -11,7 +11,7 @@ import cv2
 import pandas as pd
 from PIL import Image
 
-dir = "F:/Datasets/MTSD/"
+dir = "C:/MTSD/"
 image_dir = dir + 'Detection/'
 train_filename = 'train.tfrecords'  # address to save the TFRecords file
 val_filename = 'val.tfrecords'  # address to save the TFRecords file
@@ -19,11 +19,14 @@ test_filename = 'test.tfrecords'  # address to save the TFRecords file
 
 
 def read_file():
-    return read_csv(dir + "GT.csv", sep=';', skiprows=1, header=None, names=["filename", "xmin", "ymin", "xmax",
+    return read_csv(dir + "GT.txt", sep=';', skiprows=1, header=None, names=["filename", "xmin", "ymin", "xmax",
                                                                       "ymax", "Sign Type", "Sign Group", "Sign Class", "TS Class", "Class ID",
                                                                       "TS Color", "Shape", "Shape ID", "Lighting",
                                                                       "Image Source"])
 
+
+def read_translation():
+    return read_csv(dir + "class_translation.txt", sep=',', header=None, names=["index", "class_name"])
 
 def class_distribution(labels):
     sign_classes, class_indices, class_counts = np.unique(labels, return_index=True, return_counts=True)
@@ -37,7 +40,23 @@ def class_distribution(labels):
     plt.title("Number of samples per different sign type", loc='center')
     plt.xlabel("Traffic Sign class/ids")
     plt.ylabel("Samples ")
-    plt.xticks(np.arange(min(x_tix), max(x_tix), 1.0))
+    plt.xticks(np.arange(min(x_tix), max(x_tix), 1.0), rotation=90, fontsize=10)
+    plt.show()
+
+
+def class_distribution_ordered(labels):
+    sign_classes, class_indices, class_counts = np.unique(labels, return_index=True, return_counts=True)
+    num_classes = sign_classes.shape[0]
+    class_counts, sign_classes = zip(*sorted(zip(class_counts, sign_classes)))
+    fig = plt.figure(figsize=(25,8))
+    plt.style.use('fivethirtyeight')
+    ax1 = fig.add_subplot(1,1,1)
+    x = range(0, num_classes)
+    plt.xticks(x, sign_classes, rotation=90, fontsize=10)
+    plt.bar(x, class_counts)
+    plt.title("Number of samples per different sign type", loc='center')
+    plt.xlabel("Traffic Sign class/ids")
+    plt.ylabel("Samples ")
     plt.show()
 
 

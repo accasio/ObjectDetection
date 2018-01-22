@@ -7,29 +7,15 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     file = utils.read_file()
-
-    regulatory_mand = file.loc[file['Class ID'].isin(range(2, 6))]
-    # utils.class_distribution(regulatory_mand['Class ID'].get_values())
-
-    # train_addrs, train_labels, test_addrs, test_labels = utils.train_test(regulatory_mand, shuffle_data=False)
-
-    height = []
-    width = []
-
-    for i in range(file.shape[0]):
-        if file['Image Source'][i] == 'Google Street View':
-            width.append(1917)
-            height.append(977)
-        elif file['Image Source'][i] == 'Panasonic Camera':
-            width.append(4592)
-            height.append(3448)
-        else:
-            width.append(3840)
-            height.append(2160)
+    # translation = utils.read_translation()
+    utils.class_distribution_ordered(file['Class ID'].get_values())
 
 
-    print(file['Image Source'].get_values())
-    print(height)
+    # sign_classes, class_indices, class_counts = np.unique(file['Class ID'].get_values(), return_index=True, return_counts=True)
+    # class_counts, sign_classes = zip(*sorted(zip(class_counts, translation['class_name'].get_values())))
+    #
+    # np.savetxt("class_counts.csv", np.column_stack((sign_classes, class_counts)), delimiter=",", fmt='%s')
+
     # file['height'] = height
     # file['width'] = width
 
