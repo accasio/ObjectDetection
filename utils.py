@@ -11,7 +11,7 @@ import cv2
 import pandas as pd
 from PIL import Image
 
-dir = "C:/MTSD/"
+dir = "d:/MTSD/copy/"
 image_dir = dir + 'Detection/'
 train_filename = 'train.tfrecords'  # address to save the TFRecords file
 val_filename = 'val.tfrecords'  # address to save the TFRecords file
@@ -19,14 +19,12 @@ test_filename = 'test.tfrecords'  # address to save the TFRecords file
 
 
 def read_file():
-    return read_csv(dir + "GT.txt", sep=';', skiprows=1, header=None, names=["filename", "xmin", "ymin", "xmax",
-                                                                      "ymax", "Sign Type", "Sign Group", "Sign Class", "TS Class", "Class ID",
-                                                                      "TS Color", "Shape", "Shape ID", "Lighting",
-                                                                      "Image Source"])
+    return read_csv(dir + "GT.csv", sep=',', skiprows=1, header=None, names=["filename", "Class ID" , "xmin", "ymin", "xmax",
+                                                                      "ymax"])
 
 
 def read_translation():
-    return read_csv(dir + "class_translation.txt", sep=',', header=None, names=["index", "class_name"])
+    return read_csv(dir + "class_translation.txt", sep=';', header=None, names=["index", "class_name"])
 
 def class_distribution(labels):
     sign_classes, class_indices, class_counts = np.unique(labels, return_index=True, return_counts=True)

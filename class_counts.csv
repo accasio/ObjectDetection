@@ -1,0 +1,66 @@
+63, Keep right,1
+64, U-turn,1
+12, Compulsory motor-cycles track,2
+17, Keep left,2
+18, No U-turn,2
+32, No left turn,2
+33, No right turn,2
+41, Pass either side,2
+66, Stop,2
+50, No entry,3
+51, Weight limit sign 5T,3
+58, Height limit sign 2.-m,4
+65, Weight limit sign 30T,4
+59, Height limit sign 3.-m,6
+61, Height limit sign 4.-m,6
+8, Height limit sign 5.-m,7
+11, Height limit sign 6.-m,7
+28, Speed limit 20,9
+36, Speed limit 30,9
+45, Speed limit 40,9
+4, Speed limit 110,11
+7, Speed limit 50,11
+47, Speed limit 60,11
+52, Speed limit 70,11
+56, Speed limit 80,11
+60, Speed limit 90,11
+27, Heavy vehicles, no driving on right lane,12
+40, No entry for vehicles exceeding 5T, trucks etc,12
+20, No Stopping ,13
+55, No parking,13
+14, Give way,14
+23, Wide limit 3.5m,14
+54, No overtaking ,17
+42, Camera operated zone ,18
+53, Road works,18
+13, Crosswind area ,20
+5, Caution! Hump,21
+6, Hump ahead,22
+26, Towing zone ,25
+9, Left bend ,26
+25, Slippery road,30
+22, Pedestrian crossing 1,31
+38, Pedestrian crossing 2,32
+46, School childeren crossing 1 ,32
+19, School childeren crossing 2,34
+2, Caution!,35
+35, Narrow roads on the left,35
+44, Traffic lights ahead,37
+34, Obstacles ahead,38
+43, Staggered junctions,38
+15, Crossroads,41
+39, Crossroads to the right,46
+29, Crossroads to the left,53
+10, Exit to the left,62
+21, Crossroads,64
+3, Minor road on left 1,70
+48, Minor road on right,70
+24, Cattle crossing,73
+30, Minor road on left 2,73
+1, Narrow bridge,81
+37, Roundabout ahead,81
+57, Split way,92
+31, Two way road,100
+16, Divided road ending,146
+49, Curve on the left,246
+62, Crossroads Y-junction,278
