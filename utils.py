@@ -26,6 +26,7 @@ def read_file():
 def read_translation():
     return read_csv(dir + "class_translation.txt", sep=';', header=None, names=["index", "class_name"])
 
+
 def class_distribution(labels):
     sign_classes, class_indices, class_counts = np.unique(labels, return_index=True, return_counts=True)
     num_classes = sign_classes.shape[0]
@@ -91,6 +92,17 @@ def draw_boxes(image_name):
     return img
 
 
+def filter_file_by_class_count(file, filter=20):
+    sign_classes, class_indices, class_counts = np.unique(file['Class ID'].get_values(), return_index=True, return_counts=True)
+    sign_classes, class_counts = zip(*((class_id, count) for class_id, count in zip(sign_classes, class_counts) if count >= filter))
+    return file[file['Class ID'].isin(sign_classes)]
+
+
+def create_count_file(file, translation):
+    sign_classes, class_indices, class_counts = np.unique(file['Class ID'].get_values(), return_index=True,
+                                                          return_counts=True)
+    class_counts, sign_classes, sign_names = zip(*sorted(zip(class_counts, sign_classes, translation['class_name'].get_values()), reverse=True))
+    np.savetxt("class_counts.txt", np.column_stack((sign_classes, sign_names, class_counts)), delimiter=";", fmt='%s')
 
 if __name__ == '__main__':
     full_labels = read_file()
