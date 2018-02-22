@@ -134,6 +134,74 @@ def create_count_file(file, translation):
     class_counts, sign_classes, sign_names = zip(*sorted(zip(class_counts, sign_classes, sign_names), reverse=True))
     np.savetxt("class_counts.txt", np.column_stack((sign_classes, sign_names, class_counts)), delimiter=";", fmt='%s')
 
+def data_gen(file):
+    image1 = file.iloc[0]
+    # img = np.asarray(Image.open('C:/mtsd/detection/' + image1['filename']).convert('L'))
+    image_contents = tf.read_file('C:/mtsd/updated/detection/' + image1['filename'])
+    img = tf.image.decode_image(image_contents, channels=3)
+    img = tf.cast(img, tf.float32)
+
+    bounding_boxes = [image1['ymin'], image1['xmin'], image1['ymax'], image1['xmax']]
+
+    bounding_boxes = tf.constant(bounding_boxes,
+                       dtype=tf.float32,
+                       shape=[1, 1, 4])
+
+    bbox = tf.constant([1, 1, 4],
+                       dtype=tf.float32,
+                       shape=[1, 1, 3])
+
+    begin, size, bbox_for_draw = tf.image.sample_distorted_bounding_box(
+        tf.shape(img),
+        use_image_if_no_bounding_boxes=True,
+        bounding_boxes=None)
+
+    # Draw the bounding box in an image summary.
+    image_with_box = tf.image.draw_bounding_boxes(tf.expand_dims(img, 0),
+                                                  bbox_for_draw)
+    tf.summary.image('images_with_box', image_with_box)
+
+    # Employ the bounding box to distort the image.
+    distorted_image = tf.slice(img, begin, size)
+
+    # sess = tf.Session()
+    # with sess.as_default():
+    #     print(type(distorted_image))
+    init_op = tf.initialize_all_variables()
+    with tf.Session() as sess:
+        sess.run(init_op)  # execute init_op
+        # print(type(np.asarray(distorted_image)))
+        # distorted_image = tf.reshape(distorted_image, image1.shape)
+        array = distorted_image.eval(session=sess)
+
+        print(array)
+        # Image.fromarray(np.ndarray(distorted_image).astype('uint8')).show()
+
+
+def move_col_to_back(df, col_to_move):
+    cols = list(df.columns.values)  # Make a list of all of the columns in the df
+    temp = cols[col_to_move]
+    cols.pop(col_to_move)
+    cols.append(temp)
+    # temp = cols[col_move_to]
+    # cols[col_move_to] = cols[col_to_move]
+    # cols[col_to_move] = temp
+    return df[cols]
+
+
+def convert_ids_to_names(file, translation):
+    cols = list(file.columns.values)
+    index = cols.index('Class ID')
+    names = []
+    for idx, id in enumerate(file['Class ID'].get_values()):
+        new = translation.loc[translation['id'] == id]
+        names.append(new['class_name'].iat[0])
+
+    n = file.columns[index]
+    file.drop(n, axis=1, inplace=True)
+    file[n] = names
+
+    return file
 
 def create_train_test(df, ratio=0.8):
     uniq = df['filename'].unique()
