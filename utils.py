@@ -5,13 +5,15 @@ import sys
 import tensorflow as tf
 from matplotlib.image import imread
 import matplotlib.pyplot as plt
-from pandas.io.parsers import read_csv
+import random
+random.seed(0)
 from random import shuffle
+from pandas.io.parsers import read_csv
 import cv2
 import pandas as pd
 from PIL import Image
 
-dir = "d:/MTSD/copy/"
+dir = "c:/MTSD/Updated/"
 image_dir = dir + 'Detection/'
 train_filename = 'train.tfrecords'  # address to save the TFRecords file
 val_filename = 'val.tfrecords'  # address to save the TFRecords file
@@ -19,8 +21,8 @@ test_filename = 'test.tfrecords'  # address to save the TFRecords file
 
 
 def read_file():
-    return read_csv(dir + "GT.csv", sep=',', skiprows=1, header=None, names=["filename", "Class ID" , "xmin", "ymin", "xmax",
-                                                                      "ymax"])
+    return read_csv(dir + "train.csv", sep=',', header=None, names=["filename", "xmin", "ymin", "xmax",
+                                                                      "ymax", "Class ID"])
 
 
 def read_translation():
@@ -53,6 +55,29 @@ def class_distribution_ordered(labels):
     x = range(0, num_classes)
     plt.xticks(x, sign_classes, rotation=90, fontsize=10)
     plt.bar(x, class_counts)
+    plt.title("Number of samples per different sign type", loc='center')
+    plt.xlabel("Traffic Sign class/ids")
+    plt.ylabel("Samples ")
+    plt.show()
+
+
+def train_test_ordered(labels, train, test):
+    sign_classes, _, class_counts = np.unique(labels, return_index=True, return_counts=True)
+    train_classes, _, train_counts = np.unique(train, return_index=True, return_counts=True)
+    test_classes, _, test_counts = np.unique(train, return_index=True, return_counts=True)
+
+    num_classes = sign_classes.shape[0]
+    class_counts, sign_classes = zip(*sorted(zip(class_counts, sign_classes)))
+    class_counts, train_counts = zip(*sorted(zip(class_counts, train_counts)))
+    class_counts, test_counts = zip(*sorted(zip(class_counts, test_counts)))
+    fig = plt.figure(figsize=(25,8))
+    plt.style.use('fivethirtyeight')
+    ax1 = fig.add_subplot(1,1,1)
+    x = range(0, num_classes)
+    plt.xticks(x, sign_classes, rotation=90, fontsize=10)
+    p1 = plt.bar(x, train_counts, color='#d62728')
+    p2 = plt.bar(x, class_counts, color='blue')
+    # plt.bar(x, test_counts)
     plt.title("Number of samples per different sign type", loc='center')
     plt.xlabel("Traffic Sign class/ids")
     plt.ylabel("Samples ")
@@ -101,8 +126,31 @@ def filter_file_by_class_count(file, filter=20):
 def create_count_file(file, translation):
     sign_classes, class_indices, class_counts = np.unique(file['Class ID'].get_values(), return_index=True,
                                                           return_counts=True)
-    class_counts, sign_classes, sign_names = zip(*sorted(zip(class_counts, sign_classes, translation['class_name'].get_values()), reverse=True))
+    sign_names = []
+    for s_class in sign_classes:
+        t = translation.loc[translation['index'] == s_class]['class_name'].item()
+        sign_names.append(t)
+
+    class_counts, sign_classes, sign_names = zip(*sorted(zip(class_counts, sign_classes, sign_names), reverse=True))
     np.savetxt("class_counts.txt", np.column_stack((sign_classes, sign_names, class_counts)), delimiter=";", fmt='%s')
+
+
+def create_train_test(df, ratio=0.8):
+    uniq = df['filename'].unique()
+    random.shuffle(uniq)
+    split = int(len(uniq) * ratio)
+    train_names = uniq[:split]
+    test_names = uniq[split:]
+    train = pd.DataFrame(columns=["filename", "Class ID", "xmin", "ymin", "xmax", "ymax"])
+    test = pd.DataFrame(columns=["filename", "Class ID", "xmin", "ymin", "xmax", "ymax"])
+    for filename in test_names:
+        val = df.loc[df['filename'] == filename]
+        test = test.append(val)
+    for filename in train_names:
+        val = df.loc[df['filename'] == filename]
+        train = train.append(val)
+    return train, test
+
 
 if __name__ == '__main__':
     full_labels = read_file()
