@@ -244,10 +244,22 @@ def video_to_frames():
             count = count + 1
 
 
+def images_to_video():
+    image_folder = './94/'
+    video_name = 'video.avi'
+
+    images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
+    frame = cv2.imread(os.path.join(image_folder, images[0]))
+    height, width, layers = frame.shape
+
+    video = cv2.VideoWriter(video_name, -1, 1, (width, height))
+
+    for image in images:
+        video.write(cv2.imread(os.path.join(image_folder, image)))
 
 
 if __name__ == '__main__':
     # full_labels = read_file()
     # full_labels.head()
     # Image.fromarray(draw_boxes(full_labels['filename'].get_values()[2])).show()
-    video_to_frames()
+    images_to_video()
