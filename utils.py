@@ -2,6 +2,7 @@ import glob
 import numpy as np
 np.random.seed(1)
 import sys
+import os
 import tensorflow as tf
 from matplotlib.image import imread
 import matplotlib.pyplot as plt
@@ -220,8 +221,33 @@ def create_train_test(df, ratio=0.8):
     return train, test
 
 
-if __name__ == '__main__':
-    full_labels = read_file()
-    full_labels.head()
-    Image.fromarray(draw_boxes(full_labels['filename'].get_values()[2])).show()
+def video_to_frames():
+    fps = 30
+    times = [[94, 97], [174, 195]]
+    cap = cv2.VideoCapture('G:/Downloads/Driving with g1w in Malaysia/Driving with g1w in Malaysia (720p_30fps_H264-192kbit_AAC).mp4')
 
+    for time in times:
+        directory = str(time[0])
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        cap.set(cv2.CAP_PROP_POS_MSEC, time[0] * 1000)  # just cue to 20 sec. position
+        success = True
+        count = 0
+        limit = (time[1] - time[0]) * fps
+        while success:
+            if count <= limit:
+                success, frame = cap.read()
+                if success:
+                    cv2.imwrite(os.path.join(directory, '%d.png') % count, frame)  # save frame as JPEG file
+            else:
+                success = False
+            count = count + 1
+
+
+
+
+if __name__ == '__main__':
+    # full_labels = read_file()
+    # full_labels.head()
+    # Image.fromarray(draw_boxes(full_labels['filename'].get_values()[2])).show()
+    video_to_frames()
