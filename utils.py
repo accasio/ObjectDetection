@@ -3,6 +3,7 @@ import numpy as np
 np.random.seed(1)
 import sys
 import os
+import itertools
 import tensorflow as tf
 from matplotlib.image import imread
 import matplotlib.pyplot as plt
@@ -10,6 +11,7 @@ import random
 random.seed(0)
 from random import shuffle
 from pandas.io.parsers import read_csv
+from sklearn.metrics import confusion_matrix
 import cv2
 import pandas as pd
 from PIL import Image
@@ -257,9 +259,85 @@ def images_to_video():
     for image in images:
         video.write(cv2.imread(os.path.join(image_folder, image)))
 
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    code in part taken from http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=90)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        if normalize == True and cm[i, j] == 0:
+            fmt = '.0f'
+        elif normalize == True and cm[i, j] != 0:
+            fmt = '.2f'
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+def conf_matrix():
+    y_true = ['Traffic lights ahead', 'Crossroads', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'Stop', 'Hump ahead', 'Speed limit 90', 'split way', 'Hump ahead', 'Minor road on left', 'H. lim. sign 5.-m', 'School children crossing 1', 'Obstacles ahead', 'split way', 'Caution! Hump', 'School children crossing 1', 'Crossroads to the right', 'Caution! Hump', 'split way', 'Obstacles ahead', 'split way', 'No Stopping', 'Crossroads to the right', 'Minor road on left', 'School children crossing 1', 'Traffic lights ahead', 'H. lim. sign 4.-m', 'No Stopping', 'Speed limit 80', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'No entry', 'No entry', 'Stop', 'split way', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'Speed limit 30', 'Towing zone', 'Pedestrian crossing 2', 'split way', 'Obstacles ahead', 'split way', 'Minor road on left', 'Speed limit 50', 'Minor road on left', 'Speed limit 90', 'Speed limit 90', 'split way', 'Left bend', 'Obstacles ahead', 'split way', 'Towing zone', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'H. lim. sign 5.-m', 'Speed limit 30', 'No parking', 'Obstacles ahead', 'split way', 'Speed limit 50', 'School children crossing 1', 'Speed limit 90', 'Speed limit 90', 'Towing zone', 'Minor road on left', 'Obstacles ahead', 'split way', 'Speed limit 50', 'No U-turn', 'Traffic lights ahead', 'H. lim. sign 5.-m', 'Obstacles ahead', 'split way']
+
+
+    y_pred = ['Pedestrian crossing 1', 'split way', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'U-turn', 'Hump ahead', 'No Stopping', 'Caution! Hump', 'Towing zone', 'Minor road on left', 'Speed limit 60', 'School children crossing 1', 'Obstacles ahead', 'split way', 'Caution! Hump', 'School children crossing 1', 'Crossroads to the right', 'Caution! Hump', 'Pedestrian crossing 2', 'Obstacles ahead', 'split way', 'No Stopping', 'Caution! Hump', 'Minor road on left', 'School children crossing 1', 'Pedestrian crossing 1', 'Speed limit 80', 'No Stopping', 'Speed limit 60', 'Traffic lights ahead', 'split way', 'Obstacles ahead', 'split way', 'Traffic lights ahead', 'No entry', 'Stop', 'Caution! Hump', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'Speed limit 60', 'Hump ahead', 'Pedestrian crossing 2', 'split way', 'Obstacles ahead', 'split way', 'split way', 'No Stopping', 'Pedestrian crossing 1', 'Speed limit 80', 'Speed limit 50', 'split way', 'Minor road on left', 'Obstacles ahead', 'Caution! Hump', 'Caution! Hump', 'Obstacles ahead', 'split way', 'Obstacles ahead', 'split way', 'H. lim. sign 5.-m', 'U-turn', 'No parking', 'Obstacles ahead', 'split way', 'Speed limit 80', 'School children crossing 1', 'Speed limit 80', 'Speed limit 80', 'Towing zone', 'Minor road on left', 'Obstacles ahead', 'split way', 'No Stopping', 'Speed limit 60', 'Traffic lights ahead', 'Speed limit 60', 'Obstacles ahead', 'split way']
+
+
+
+    plt.rcParams.update({'font.size': 3.5})
+
+    cnf_matrix = confusion_matrix(y_true, y_pred, labels=["Obstacles ahead", "H. lim. sign 5.-m", "Give way", "Minor road on left", "U-turn", "Caution! Hump",
+                  "Keep left", "No entry", "Stop", "No Stopping", "Traffic lights ahead", "Speed limit 80",
+                  "Keep right", "Crossroads to the left", "Speed limit 60", "Speed limit 50",
+                  "School children crossing 1", "Hump ahead", "No parking", "Towing zone", "Caution!",
+                  "H. lim. sign 4.-m", "Pedestrian crossing 2", "Road works", "Speed limit 30",
+                  "Compulsory motor-cycles track", "Camera operated zone", "Crossroads to the right",
+                  "Speed limit 90", "No U-turn", "H. lim. sign 2.-m", "Roundabout ahead", "Narrow roads on the left",
+                  "Crossroads", "Pedestrian crossing 1", "Speed limit 110", "H. lim. sign 3.-m", "Left bend",
+                  "split way"])
+    class_names = "Obstacles ahead", "H. lim. sign 5.-m", "Give way", "Minor road on left", "U-turn", "Caution! Hump", \
+                  "Keep left", "No entry", "Stop", "No Stopping", "Traffic lights ahead", "Speed limit 80", \
+                  "Keep right", "Crossroads to the left", "Speed limit 60", "Speed limit 50", \
+                  "School children crossing 1", "Hump ahead", "No parking", "Towing zone", "Caution!", \
+                  "H. lim. sign 4.-m", "Pedestrian crossing 2", "Road works", "Speed limit 30", \
+                  "Compulsory motor-cycles track", "Camera operated zone", "Crossroads to the right", \
+                  "Speed limit 90", "No U-turn", "H. lim. sign 2.-m", "Roundabout ahead", "Narrow roads on the left", \
+                  "Crossroads", "Pedestrian crossing 1", "Speed limit 110", "H. lim. sign 3.-m", "Left bend", \
+                  "split way"
+    # plt.figure()
+    # plot_confusion_matrix(cnf_matrix, classes=class_names,
+    #                       title='Confusion matrix, without normalization')
+
+    # Plot normalized confusion matrix
+    plt.figure()
+    plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix')
+    plt.savefig('small.png', format='png', dpi=4000)
 
 if __name__ == '__main__':
     # full_labels = read_file()
     # full_labels.head()
     # Image.fromarray(draw_boxes(full_labels['filename'].get_values()[2])).show()
-    images_to_video()
+    conf_matrix()
